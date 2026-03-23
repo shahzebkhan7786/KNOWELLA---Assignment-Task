@@ -1,22 +1,24 @@
-const axios = require("axios");
+app.get("/api/weather", async (req, res) => {
+  try {
+    const { lat, lon } = req.query;
 
-exports.getWeather = async (lat, lon) => {
-  const apiKey = process.env.WEATHER_API_KEY;
-
-  if (!apiKey) {
-    throw new Error("Missing API Key");
-  }
-
-  const res = await axios.get(
-    `https://api.openweathermap.org/data/2.5/weather`,
-    {
-      params: {
-        lat,
-        lon,
-        appid: apiKey
-      }
+    if (!process.env.WEATHER_API_KEY) {
+      return res.json({
+        type: "INFO",
+        message: "Weather API key not configured"
+      });
     }
-  );
 
-  return res.data;
-};
+    const weather = await getWeather(lat, lon);
+    const alert = checkAlert(weather);
+
+    res.json(alert);
+  } catch (err) {
+    console.error(err);
+
+    res.json({
+      type: "ERROR",
+      message: "Weather service unavailable"
+    });
+  }
+});
