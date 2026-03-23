@@ -20,7 +20,7 @@ app.get("/", (req, res) => {
 app.get("/api/csv", async (req, res) => {
   try {
     const filePath = path.join(process.cwd(), "sample.csv");
-    const data = await processCSV(filePath, config);
+    const data = await processCSV(config);
     res.json(data);
   } catch (err) {
     console.error("CSV ERROR:", err);
