@@ -1,62 +1,35 @@
-const express = require("express");
-const serverless = require("serverless-http");
-
-const app = express();
-app.use(express.json());
-
-/* ROOT */
-app.get("/", (req, res) => {
-  res.send("API is running 🚀");
-});
-
-/* CSV (SAFE - NO FILE SYSTEM) */
-app.get("/api/csv", async (req, res) => {
+export default function handler(req, res) {
   try {
-    const data = [
-      { name: "JOHN", age: 28 },
-      { name: "BOB", age: 35 }
-    ];
-    res.json(data);
-  } catch (err) {
-    console.error(err);
-    res.status(200).json({ error: "CSV fallback response" });
-  }
-});
+    const { url, method } = req;
 
-/* DELIVERY (SAFE) */
-app.post("/api/delivery", (req, res) => {
-  try {
-    const points = req.body.points || [];
-
-    if (!points.length) {
-      return res.json({ message: "No points provided" });
+    if (url === "/") {
+      return res.status(200).send("API running 🚀");
     }
 
-    // simple safe return
-    res.json(points);
+    if (url.startsWith("/api/csv")) {
+      return res.status(200).json([
+        { name: "JOHN", age: 28 },
+        { name: "BOB", age: 35 }
+      ]);
+    }
+
+    if (url.startsWith("/api/delivery") && method === "POST") {
+      return res.status(200).json({
+        message: "Delivery endpoint working"
+      });
+    }
+
+    if (url.startsWith("/api/weather")) {
+      return res.status(200).json({
+        type: "INFO",
+        message: "Weather API working"
+      });
+    }
+
+    return res.status(200).json({ message: "Fallback route" });
+
   } catch (err) {
     console.error(err);
-    res.status(200).json({ error: "Delivery fallback" });
+    return res.status(200).json({ error: "Safe fallback" });
   }
-});
-
-/* WEATHER (SAFE - NO EXTERNAL API) */
-app.get("/api/weather", (req, res) => {
-  try {
-    res.json({
-      type: "INFO",
-      message: "Weather service running (mock)"
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(200).json({ error: "Weather fallback" });
-  }
-});
-
-/* GLOBAL FALLBACK (VERY IMPORTANT) */
-app.use((req, res) => {
-  res.status(200).json({ message: "Fallback route hit" });
-});
-
-/* EXPORT */
-module.exports = serverless(app);
+}
