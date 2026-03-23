@@ -1,0 +1,8 @@
+{
+  "filters": [
+    { "column": "age", "operator": ">", "value": 25 }
+  ],
+  "transformations": [
+    { "column": "name", "operation": "uppercase" }
+  ]
+}
