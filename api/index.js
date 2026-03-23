@@ -64,3 +64,8 @@ app.get("/api/weather", async (req, res) => {
 
 /* EXPORT FOR VERCEL */
 module.exports = serverless(app);
+
+app.use((err, req, res, next) => {
+  console.error("GLOBAL ERROR:", err);
+  res.status(500).json({ error: "Something broke!" });
+});
